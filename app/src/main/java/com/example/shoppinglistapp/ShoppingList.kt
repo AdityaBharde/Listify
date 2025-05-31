@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -61,7 +62,28 @@ fun ShoppingListapp(){
             modifier= Modifier.fillMaxSize().padding(16.dp)
         ) {
             items(sItems){
-                ShoppingListItem(it,{},{})
+                item->
+                if(item.isEditing){
+                    ShoppingItemEditor(item= item, onEditComplete ={
+                        editedName,editedQuantity ->
+                        sItems= sItems.map{it.copy(isEditing = false)}
+                        val editedItem= sItems.find{it.id==item.id}
+                        editedItem?.let{
+                          it.name=editedName
+                          it.quantity=editedQuantity
+                        }
+                    })
+                }
+                else{
+                    ShoppingListItem(
+                        item = item, onEditClick = {
+                            sItems = sItems.map { it.copy(isEditing = it.id == item.id) }
+                        },
+                        onDeleteClick = {
+                            sItems=sItems-item
+                        }
+                    )
+                }
             }
 
         }
@@ -163,8 +185,26 @@ fun ShoppingItemEditor(item : ShoppingItem, onEditComplete : (String, Int)-> Uni
     Row(modifier = Modifier.fillMaxWidth().background(Color.White).padding(8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ){
-
-
+        BasicTextField(
+            value=editedName,
+            onValueChange = {editedName=it},
+            singleLine = true,
+            modifier = Modifier.wrapContentSize().padding(8.dp)
+        )
+        BasicTextField(
+            value=editedQuantity,
+            onValueChange = {editedQuantity=it},
+            singleLine = true,
+            modifier = Modifier.wrapContentSize().padding(8.dp)
+        )
+    }
+    Button(
+        onClick = {
+            isEditing=false
+            onEditComplete(editedName,editedQuantity.toIntOrNull() ?:1)
+        }
+    ) {
+        Text("Save")
     }
 
 }
