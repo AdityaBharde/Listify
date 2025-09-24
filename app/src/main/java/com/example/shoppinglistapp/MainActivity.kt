@@ -3,6 +3,7 @@ package com.example.shoppinglistapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -33,13 +34,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Navigation(){
+fun Navigation() {
     val navController = rememberNavController()
     val viewModel: LocationViewModel = viewModel()
     val context = LocalContext.current
     val locationUtils = LocationUtils(context)
 
-    NavHost(navController, startDestination = "shoppinglistscreen"){
+    NavHost(navController, startDestination = "shoppinglistscreen") {
         composable("shoppinglistscreen") {
             ShoppingListApp(
                 locationUtils = locationUtils,
@@ -50,9 +51,8 @@ fun Navigation(){
             )
         }
 
-        dialog("locationscreen"){backstack->
-            viewModel.location.value?.let{it1 ->
-
+        dialog("locationscreen") { backstack ->
+            viewModel.location.value?.let { it1 ->
                 LocationSelectionScreen(location = it1, onLocationSelected = { locationdata ->
                     viewModel.fetchAddress("${locationdata.latitude},${locationdata.longitude}")
                     navController.popBackStack()
@@ -61,4 +61,3 @@ fun Navigation(){
         }
     }
 }
-
